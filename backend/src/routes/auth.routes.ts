@@ -44,7 +44,7 @@ router.post('/login', async (req, res) => {
         role: user.role,
         companyId: user.companyId,
       },
-      process.env.JWT_SECRET || 'default-secret-change-in-production',
+      (process.env.JWT_SECRET || 'default-secret-change-in-production') as string,
       { expiresIn: process.env.JWT_EXPIRES_IN || '7d' }
     );
 
