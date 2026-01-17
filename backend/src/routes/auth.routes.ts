@@ -2,6 +2,7 @@ import { Router } from 'express';
 import { PrismaClient } from '@prisma/client';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
+import { createSecretKey } from 'crypto';
 import { z } from 'zod';
 
 const router = Router();
@@ -37,7 +38,8 @@ router.post('/login', async (req, res) => {
       });
     }
 
-    const secret = process.env.JWT_SECRET || 'default-secret-change-in-production';
+    const rawSecret = process.env.JWT_SECRET || 'default-secret-change-in-production';
+    const secret = createSecretKey(Buffer.from(rawSecret));
     const token = jwt.sign(
       {
         id: user.id,
@@ -91,7 +93,9 @@ router.get('/me', async (req, res) => {
       });
     }
 
-    const decoded = jwt.verify(token, process.env.JWT_SECRET!) as any;
+    const rawSecret = process.env.JWT_SECRET || 'default-secret-change-in-production';
+    const secret = createSecretKey(Buffer.from(rawSecret));
+    const decoded = jwt.verify(token, secret) as any;
     const user = await prisma.user.findUnique({
       where: { id: decoded.id },
       include: { company: true },
