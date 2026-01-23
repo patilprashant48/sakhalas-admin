@@ -39,8 +39,17 @@ app.use((err: any, req: express.Request, res: express.Response, next: express.Ne
 });
 
 app.listen(PORT, () => {
-  console.log(`🚀 Server running on http://localhost:${PORT}`);
-  console.log(`📊 API available at http://localhost:${PORT}/api`);
+  // Prefer a public URL provided by the hosting platform if available
+  const publicUrl = process.env.RENDER_EXTERNAL_URL || process.env.PUBLIC_URL || process.env.APP_URL;
+
+  console.log(`🚀 Server listening on port ${PORT}`);
+  if (publicUrl) {
+    const base = publicUrl.replace(/\/$/, '');
+    console.log(`📡 Public URL: ${base}`);
+    console.log(`📊 API available at ${base}/api`);
+  } else {
+    console.log(`📊 API available at http://localhost:${PORT}/api`);
+  }
 });
 
 export default app;
